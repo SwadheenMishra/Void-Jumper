@@ -4,7 +4,7 @@ import time
 import math
 from Scripts import sound
 
-app = Ursina()
+app = Ursina(title="Look at the screen not here!")
 window.basic_shaders = True
 
 GameScene1 = []
@@ -150,13 +150,21 @@ def game_scene1():
 
     # sound.play_sound("Audio/f1.mp3")
 
-    Entity(model="Models/mp5_submachine_gun.glb", position=Vec3(2, 1, 1), parent=camera)
+    GunItem = Entity(
+    model="Models/mp5_submachine_gun.glb",
+    parent=camera,                          # 👈 Parent it to the camera
+    position=Vec3(0.5, -0.2, 0.9),            # 👈 Adjust position relative to camera
+    rotation=Vec3(5, 180, 0),               # 👈 Optional: flip/rotate gun to face forward
+    scale=1.5                              # 👈 Adjust to fit screen
+    )
+
 
     GameScene1.append(player)
     GameScene1.append(ground)
     GameScene1.append(spawn)
     GameScene1.append(portalFrame)
     GameScene1.append(portal)
+    GameScene1.append(GunItem)
 
 
 def set_lava_scale(TextureScale: float | int) -> None:
