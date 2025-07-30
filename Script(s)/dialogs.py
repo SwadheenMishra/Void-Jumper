@@ -17,12 +17,10 @@ def speak(text: str, fileName, tld="co.uk"):
     while pygame.mixer.music.get_busy():
         pygame.time.Clock().tick(10)
 
-    os.remove(fileName)
-
-def dialog1():
-    def speak_all():
-        
-    threading.Thread(target=speak_all, daemon=True).start()
+# def dialog1():
+#     def speak_all():
+#         sound.play_sound("")
+#     threading.Thread(target=speak_all, daemon=True).start()
 
 
 def dialog2():

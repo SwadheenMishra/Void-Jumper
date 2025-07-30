@@ -1,7 +1,6 @@
 from ursina import *
 from ursina.prefabs.first_person_controller import FirstPersonController
 import time
-from dialogs import *
 
 app = Ursina()
 window.basic_shaders = True

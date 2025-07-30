@@ -9,4 +9,5 @@ def play_sound(file: str) -> None:
     while pygame.mixer.music.get_busy():
         pygame.time.Clock().tick(10)
 
-play_sound("f1.mp3")
+if __name__ == "__main__":
+    play_sound("f1.mp3")
