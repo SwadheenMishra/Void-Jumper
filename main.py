@@ -1,6 +1,7 @@
 from ursina import *
 from ursina.prefabs.first_person_controller import FirstPersonController
 import time
+from Scripts import sound
 
 app = Ursina()
 window.basic_shaders = True
@@ -56,8 +57,8 @@ class Player:
     def __init__(self):
         self.player = FirstPersonController(collider="box")
         self.player.jump_height = 3
-        self.player.cursor.disable()
-        self.player.cursor = Entity(parent=camera.ui, model='sphere', color=color.black, scale=.0008, rotation_z=45)
+        # self.player.cursor.disable()
+        # self.player.cursor = Entity(parent=camera.ui, model='sphere', color=color.black, scale=.0008, rotation_z=45)
 
     def get_position(self) -> Vec3:
         return self.player.position
@@ -83,7 +84,7 @@ util = utils()
 ground = Entity()
 
 def main_menu():
-    WelcomeText = Text('Welcome to Void Jumper!', color=color.blue, world_scale=2, origin=(0, -9))
+    WelcomeText = Text('Welcome to Void Jumper!', color=color.blue, origin=(0, -9), world_scale=40)
     
     def play():
         util.set_scene(GameScene1, scenes)
@@ -91,10 +92,10 @@ def main_menu():
 
     PlayBtn = Button(
         text='Play',
-        scale=(0.2, 0.1),  # Width and height
+        scale=(0.4, 0.2),  # Width and height
         origin=(0,0),
         on_click=play,
-        parent=camera.ui
+        text_size=3.5
     )
 
 
@@ -145,7 +146,7 @@ def game_scene1():
         GameScene1.append(platform)
 
 
-    dialog1()
+    # sound.play_sound("Audio/f1.mp3")
 
     GameScene1.append(player)
     GameScene1.append(ground)
@@ -194,7 +195,7 @@ def game_scene2():
     hookshot_target = Button(parent=scene, model='sphere', color=color.cyan, position=(0,14,25), scale=0.6)
     hookshot_target.on_click = Func(player.player.animate_position, hookshot_target.position, duration=.5, curve=curve.linear)
 
-    dialog2()
+    # dialog2()
 
     GameScene2.append(player)
     GameScene2.append(lava)
@@ -214,7 +215,7 @@ def game_scene3():
 
 
 
-    dialog3()
+    # dialog3()
 
     GameScene1.append(player)
     GameScene1.append(spawn)

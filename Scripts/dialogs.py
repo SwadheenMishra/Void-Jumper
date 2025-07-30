@@ -1,4 +1,4 @@
-
+'''This is the script used to create all the audio files in ../Audio'''
 import threading
 from gtts import gTTS
 import pygame
