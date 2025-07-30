@@ -22,8 +22,8 @@ TimeWhenTextureChanged = time.time()
 
 class utils:
     def distance_between(self, entity1: Entity, entity2: Entity):
-        xp, yp, zp = entity1.get_position()
-        xe, ye, ze = entity2.get_position()
+        xp, yp, zp = entity1.position
+        xe, ye, ze = entity2.position
         dx, dy, dz = xp - xe, yp - ye, zp - ze
 
         distance2D = ((dx ** 2) + (dz ** 2)) ** 0.5
@@ -84,7 +84,7 @@ util = utils()
 ground = Entity()
 
 def main_menu():
-    WelcomeText = Text('Welcome to Void Jumper!', color=color.blue, origin=(0, -9), world_scale=40)
+    WelcomeText = Text('Welcome to Void Jumper!', color=color.blue, origin=(0, -6.5), world_scale=50)
     
     def play():
         util.set_scene(GameScene1, scenes)
@@ -93,14 +93,23 @@ def main_menu():
     PlayBtn = Button(
         text='Play',
         scale=(0.4, 0.2),  # Width and height
-        origin=(0,0),
+        origin=(0,-0.9),
         on_click=play,
+        text_size=3.5
+    )
+
+    QuitBtn = Button(
+        text="Quit",
+        scale=(0.4, 0.2),  # Width and height
+        origin=(0,0.9),
+        on_click=lambda: print("test quit"),
         text_size=3.5
     )
 
 
     MainMenuScene1.append(WelcomeText)
     MainMenuScene1.append(PlayBtn)
+    MainMenuScene1.append(QuitBtn)
 
 
 def create_portal(pos: Vec3) -> list:
@@ -114,20 +123,12 @@ def create_portal(pos: Vec3) -> list:
     
     return portal
 
-def graple(hookshot_target):
-    player_pos = player.get_position()
-    target_pos = hookshot_target.position
+def graple(hookshot_target: Button):
+    if util.distance_between(player.player, hookshot_target) > 17:
+        return
+    
+    player.player.animate_position(hookshot_target.position, duration=.5, curve=curve.linear)
 
-    # Animate the player
-    player.player.animate_position(target_pos, duration=.5, curve=curve.linear)
-
-    # Create the line mesh
-    mesh = Mesh(vertices=[player_pos, target_pos], mode='line')
-    mesh.generate()  # VERY important
-
-    # Create and store the line entity
-    line = Entity(model=mesh, color=color.red)
-    GameScene1.append(line)  # Or just keep a reference somewhere if you want to disable it later
 
 
 def game_scene1():
@@ -193,7 +194,7 @@ def game_scene2():
 
 
     hookshot_target = Button(parent=scene, model='sphere', color=color.cyan, position=(0,14,25), scale=0.6)
-    hookshot_target.on_click = Func(player.player.animate_position, hookshot_target.position, duration=.5, curve=curve.linear)
+    hookshot_target.on_click = lambda: graple(hookshot_target)
 
     # dialog2()
 
@@ -203,6 +204,7 @@ def game_scene2():
     GameScene2.append(portalFrame)
     GameScene2.append(portal)
     GameScene2.append(hookshot_target)
+    GameScene2.append(ground)
 
 def game_scene3():
     global platforms, portalList
