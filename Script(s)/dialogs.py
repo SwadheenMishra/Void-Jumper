@@ -3,6 +3,7 @@ import threading
 from gtts import gTTS
 import pygame
 import os
+import sound
 
 pygame.mixer.init()
 
@@ -20,13 +21,7 @@ def speak(text: str, fileName, tld="co.uk"):
 
 def dialog1():
     def speak_all():
-        speak(
-            "oh, you're finally awake. Welcome, Agent Three-Seven-Five. "
-            "You have been carefully selected for the esteemed Void Jumper Initiative. "
-            "Ahead of you stands your first portal—twelve o'clock sharp. "
-            "Proceed with care, and do try not to fall.",
-            "f1.mp3"
-        )
+        
     threading.Thread(target=speak_all, daemon=True).start()
 
 
