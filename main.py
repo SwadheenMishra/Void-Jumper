@@ -21,6 +21,9 @@ portalList = []
 textureChangeCoolDown = 0.5
 TimeWhenTextureChanged = time.time()
 
+
+GunItem = Entity()
+
 class utils:
     def distance_between(self, entity1: Entity, entity2: Entity):
         xp, yp, zp = entity1.position
@@ -58,6 +61,7 @@ class Player:
     def __init__(self):
         self.player = FirstPersonController(collider="box")
         self.player.jump_height = 3
+        self.HasGun = False
         # self.player.cursor.disable()
         # self.player.cursor = Entity(parent=camera.ui, model='sphere', color=color.black, scale=.0008, rotation_z=45)
 
@@ -75,6 +79,16 @@ class Player:
 
     def kill(self):
         self.disable()
+
+    def equip_gun(self):
+        self.HasGun = True
+        GunHandItem = Entity(
+        model="Models/mp5_submachine_gun.glb",
+        parent=camera,                          
+        position=Vec3(0.5, -0.3, 0.9),          
+        rotation=Vec3(5, 180, 0),              
+        scale=1.5                      
+        )
 
     def on_update(self):
         pass
@@ -133,7 +147,7 @@ def graple(hookshot_target: Button):
 
 
 def game_scene1():
-    global platforms, portalList
+    global platforms, portalList, GunItem
 
     platforms = []
     ground = Entity(model='plane', collider='box', scale=64, color=color.black50, texture_scale=(10,10), Collider="box")
@@ -151,11 +165,11 @@ def game_scene1():
     # sound.play_sound("Audio/f1.mp3")
 
     GunItem = Entity(
-    model="Models/mp5_submachine_gun.glb",
-    parent=camera,                          # 👈 Parent it to the camera
-    position=Vec3(0.5, -0.2, 0.9),            # 👈 Adjust position relative to camera
-    rotation=Vec3(5, 180, 0),               # 👈 Optional: flip/rotate gun to face forward
-    scale=1.5                              # 👈 Adjust to fit screen
+    model="Models/mp5_submachine_gun.glb",  
+    position=Vec3(5, 1, 0),          
+    rotation=Vec3(5, 180, 0),              
+    scale=1.7,
+    collider="mesh"                      
     )
 
 
@@ -278,6 +292,12 @@ def update():
         if portalList[1].intersects(player.player).hit or portalList[0].intersects(player.player).hit:
             game_scene2()
             util.set_scene(GameScene2, scenes)
+        
+        # a = 1
+        # if a:
+        #     print(a)
+        #     GunItem.disable()
+        #     player.equip_gun()
 
 
     if currentScene == GameScene2:
