@@ -1,7 +1,5 @@
 from ursina import *
 from ursina.prefabs.first_person_controller import FirstPersonController
-import time
-import math
 from Scripts import sound
 
 app = Ursina(title="Look at the screen not here!")
@@ -10,14 +8,15 @@ window.basic_shaders = True
 GameScene1 = []
 GameScene2 = []
 GameScene3 = []
+GameScene4 = []
 MainMenuScene1 = []
 
 currentScene = MainMenuScene1
-scenes = [MainMenuScene1, GameScene1, GameScene2, GameScene3]
+scenes = [MainMenuScene1, GameScene1, GameScene2, GameScene3, GameScene4]
 
 platforms = []
 portalList = []
-
+MovingPlatFormsList = []
 textureChangeCoolDown = 0.5
 TimeWhenTextureChanged = time.time()
 
@@ -62,6 +61,7 @@ class Player:
         self.player = FirstPersonController(collider="box")
         self.player.jump_height = 3
         self.HasGun = False
+        self.currentDialog = 0
         # self.player.cursor.disable()
         # self.player.cursor = Entity(parent=camera.ui, model='sphere', color=color.black, scale=.0008, rotation_z=45)
 
@@ -90,9 +90,27 @@ class Player:
         scale=1.5                      
         )
 
-    def on_update(self):
-        pass
 
+class MovingPlatform:
+    def __init__(self, yStart: int, xStart: int, xEnd: int, zStart: int, zEnd: int, speed: int|float):
+        pos = Vec3(xStart, yStart, zStart)
+        self.Entity = Entity(model="cube", scale=Vec3(2.5, 0.1, 3.5), position=pos, collider="box")
+        self.xStart = xStart
+        self.xEnd = xEnd
+        self.zStart = zStart
+        self.zEnd = zEnd
+        self.speed = speed
+
+    def calculate_move_vector(self, current, target):
+        MoveVector = [target[0] - current[0], target[1] - current[1]]
+        return MoveVector
+    
+    def update(self):
+        vec = self.calculate_move_vector([self.Entity.x_getter(), self.Entity.z_getter()], [self.xEnd, self.zEnd])
+        Vec3(vec[0], 0, vec[1]) * time.dt * self.speed
+
+def create_platform(pos: Vec3):
+    return Entity(model="cube", scale=Vec3(1.5, 0.1, 1.5), position=pos, collider="box")
 
 player = Player()
 util = utils()
@@ -127,7 +145,7 @@ def main_menu():
     MainMenuScene1.append(QuitBtn)
 
 
-def create_portal(pos: Vec3) -> list:
+def create_portal(pos: Vec3) -> list[Entity, Entity]:
     portal = []
     portalPortal = Entity(model="cube", scale=Vec3(2, 3.5, 0.3), position=pos, collider="box", color=color.black)
     portalPortal.alpha_setter(0.6)
@@ -145,9 +163,8 @@ def graple(hookshot_target: Button):
     player.player.animate_position(hookshot_target.position, duration=.5, curve=curve.linear)
 
 
-
 def game_scene1():
-    global platforms, portalList, GunItem
+    global platforms, portalList, GunItem, MovingPlatFormsList
 
     platforms = []
     ground = Entity(model='plane', collider='box', scale=64, color=color.black50, texture_scale=(10,10), Collider="box")
@@ -161,17 +178,15 @@ def game_scene1():
         platforms.append(platform)
         GameScene1.append(platform)
 
-
-    # sound.play_sound("Audio/f1.mp3")
-
     GunItem = Entity(
     model="Models/mp5_submachine_gun.glb",  
     position=Vec3(5, 1, 0),          
     rotation=Vec3(5, 180, 0),              
     scale=1.7,
-    collider="mesh"                      
+    collider="box"                      
     )
 
+    sound.play_dialog1()
 
     GameScene1.append(player)
     GameScene1.append(ground)
@@ -221,7 +236,8 @@ def game_scene2():
     hookshot_target = Button(parent=scene, model='sphere', color=color.cyan, position=(0,14,25), scale=0.6)
     hookshot_target.on_click = lambda: graple(hookshot_target)
 
-    # dialog2()
+
+    sound.play_dialog2()
 
     GameScene2.append(player)
     GameScene2.append(lava)
@@ -243,28 +259,29 @@ def game_scene3():
     ground.position_setter((lava.position_getter().x_getter(), lava.position_getter().y_getter() - 0.25, lava.position_getter().z_getter()))
     spawn = Entity(model='cube', scale=Vec3(2, 0.5, 2), position=Vec3(0, 0, 0), collider="box", texture="brick")
 
-    portalList = create_portal(Vec3(0, 13.5, 2))
+    portalList = create_portal(Vec3(6, 14.75, 0))
     portalFrame, PortalPortal = portalList
 
     for i in range(1, 4):
         platform = Entity(model="cube", scale=Vec3(1.5, 0.1, 1.5), position=Vec3(0, i, i * 3), collider="box")
         platforms.append(platform)
-        GameScene1.append(platform)
+        GameScene3.append(platform)
 
     for j in range(1, 4):
         platform = Entity(model="cube", scale=Vec3(1.5, 0.1, 1.5), position=Vec3(j * 3, i + j, i * 3), collider="box")
         platforms.append(platform)
-        GameScene1.append(platform)
+        GameScene3.append(platform)
     
-    for k in range(1, 4):
+    for k in range(1, 5):
         platform = Entity(model="cube", scale=Vec3(1.5, 0.1, 1.5), position=Vec3(j * 3, i + j + k, i * 3 - k * 3), collider="box")
         platforms.append(platform)
-        GameScene1.append(platform)
+        GameScene3.append(platform)
     
     for m in range(1, 4):
         platform = Entity(model="cube", scale=Vec3(1.5, 0.1, 1.5), position=Vec3(j * 3 - m * 3, i + j + k + m, i * 3 - k * 3), collider="box")
         platforms.append(platform)
-        GameScene1.append(platform)
+        GameScene3.append(platform)
+        print(j * 3 - m * 3, i + j + k + m, i * 3 - k * 3)
 
     GameScene3.append(player)
     GameScene3.append(spawn)
@@ -272,6 +289,22 @@ def game_scene3():
     GameScene3.append(ground)
     GameScene3.append(PortalPortal)
     GameScene3.append(portalFrame)
+
+def game_scene4():
+    global platforms, portalList, ground
+
+    player.set_position((0, 0, 0))
+
+    platforms = []
+    lava = Entity(model='plane', collider='box', scale=640, color=color.red)
+    lava.alpha_setter(.55)
+    ground = Entity(model='plane', collider='box', scale=640, texture="grass", texture_scale=(3.5,3.5), Collider="box")
+    ground.position_setter((lava.position_getter().x_getter(), lava.position_getter().y_getter() - 0.25, lava.position_getter().z_getter()))
+    spawn = Entity(model='cube', scale=Vec3(2, 0.5, 2), position=Vec3(0, 0, 0), collider="box", texture="brick")
+
+    GameScene4.append(lava)
+    GameScene4.append(ground)
+    GameScene4.append(spawn)
 
 def main():
     main_menu()
@@ -281,8 +314,6 @@ def update():
     global TimeWhenTextureChanged
 
     if currentScene == GameScene1:
-        # player.on_update()
-
         for platform in platforms:
             if platform.intersects(player.player).hit:
                 platform.color = color.white50
@@ -292,12 +323,6 @@ def update():
         if portalList[1].intersects(player.player).hit or portalList[0].intersects(player.player).hit:
             game_scene2()
             util.set_scene(GameScene2, scenes)
-        
-        # a = 1
-        # if a:
-        #     print(a)
-        #     GunItem.disable()
-        #     player.equip_gun()
 
 
     if currentScene == GameScene2:
@@ -309,6 +334,7 @@ def update():
         
         if portalList[1].intersects(player.player).hit or portalList[0].intersects(player.player).hit:
             util.set_scene(GameScene3, scenes)
+            game_scene3()
 
         if time.time() - TimeWhenTextureChanged >= textureChangeCoolDown:
             randomScale = (3 + random.random()) * 10
@@ -323,8 +349,8 @@ def update():
                 platform.color = color.green
 
         if portalList[1].intersects(player.player).hit or portalList[0].intersects(player.player).hit:
-            util.set_scene(GameScene3, scenes)
-            game_scene3()
+            util.set_scene(GameScene4, scenes)
+            game_scene4()
 
         if time.time() - TimeWhenTextureChanged >= textureChangeCoolDown:
             randomScale = (3 + random.random()) * 10
