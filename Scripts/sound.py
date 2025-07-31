@@ -26,6 +26,21 @@ def play_dialog2():
 
     threading.Thread(target=play, daemon=True).start()
 
+def play_dialog3():
+    def play():
+        play_sound("Audio/f3.mp3")
+
+    threading.Thread(target=play, daemon=True).start()
+
+def play_dialog4():
+    def play():
+        # pygame.mixer.stop()
+        play_sound("Audio/f4.mp3")
+        time.sleep(1)
+        play_sound("Audio/f4_1.mp3")
+
+    threading.Thread(target=play, daemon=True).start()
+
 
 
 if __name__ == "__main__":

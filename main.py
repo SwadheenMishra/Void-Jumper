@@ -48,7 +48,7 @@ class utils:
             element.enable()
         
         # Disable player if not in the current scene
-        if target in [GameScene1, GameScene2, GameScene3]:
+        if target in [GameScene1, GameScene2, GameScene3, GameScene4]:
             player.enable()
         else:
             player.disable()
@@ -120,6 +120,9 @@ class MovingPlatform:
                 z = -1
 
         return [x, z]
+    
+    def disable(self):
+        self.Entity.disable()
     
     def update(self):
         vec = self.calculate_move_vector([self.Entity.x_getter(), self.Entity.z_getter()], self.TargetPos)
@@ -274,6 +277,9 @@ def game_scene2():
 def game_scene3():
     global platforms, portalList, ground, MovingPlatFormsList
 
+    for MP in MovingPlatFormsList:
+        MP.disable()
+
     MovingPlatFormsList.append(MovingPlatform(13, -5, 5, 1, 1, 1))
     MovingPlatFormsList.append(MovingPlatform(13, 5, -5, 5.5, 5.5, 1))
     MovingPlatFormsList.append(MovingPlatform(13, -5, 5, 10, 10, 1))
@@ -310,6 +316,10 @@ def game_scene3():
         platforms.append(platform)
         GameScene3.append(platform)
 
+    
+
+    sound.play_dialog3()
+
     GameScene3.append(player)
     GameScene3.append(spawn)
     GameScene3.append(lava)
@@ -318,7 +328,10 @@ def game_scene3():
     GameScene3.append(portalFrame)
 
 def game_scene4():
-    global platforms, portalList, ground
+    global platforms, portalList, ground, MovingPlatFormsList
+
+    for MP in MovingPlatFormsList:
+        MP.disable()
 
     player.set_position((0, 0, 0))
 
@@ -329,6 +342,10 @@ def game_scene4():
     ground.position_setter((lava.position_getter().x_getter(), lava.position_getter().y_getter() - 0.25, lava.position_getter().z_getter()))
     spawn = Entity(model='cube', scale=Vec3(2, 0.5, 2), position=Vec3(0, 0, 0), collider="box", texture="brick")
 
+
+    sound.play_dialog4()
+
+    GameScene4.append(player)
     GameScene4.append(lava)
     GameScene4.append(ground)
     GameScene4.append(spawn)
@@ -384,6 +401,12 @@ def update():
             set_lava_scale((randomScale, randomScale))
             TimeWhenTextureChanged = time.time()
     
+    if currentScene == GameScene4:
+        if time.time() - TimeWhenTextureChanged >= textureChangeCoolDown:
+            randomScale = (3 + random.random()) * 10
+            set_lava_scale((randomScale, randomScale))
+            TimeWhenTextureChanged = time.time()
+
     for movingPlatform in MovingPlatFormsList:
         movingPlatform.update()
 
