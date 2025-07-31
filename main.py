@@ -94,7 +94,7 @@ class Player:
 class MovingPlatform:
     def __init__(self, yStart: int, xStart: int, xEnd: int, zStart: int, zEnd: int, speed: int|float):
         pos = Vec3(xStart, yStart, zStart)
-        self.Entity = Entity(model="cube", scale=Vec3(2.5, 0.1, 3.5), position=pos, collider="box")
+        self.Entity = Entity(model="cube", scale=Vec3(3.5, 0.1, 2.5), position=pos, collider="box")
         self.xStart = xStart
         self.xEnd = xEnd
         self.zStart = zStart
@@ -188,9 +188,7 @@ def graple(hookshot_target: Button):
 
 
 def game_scene1():
-    global platforms, portalList, GunItem, MovingPlatFormsList
-
-    MovingPlatFormsList.append(MovingPlatform(2, -5, 5, -5, 5, 1))
+    global platforms, portalList, GunItem
 
     platforms = []
     ground = Entity(model='plane', collider='box', scale=64, color=color.black50, texture_scale=(10,10), Collider="box")
@@ -274,7 +272,11 @@ def game_scene2():
     GameScene2.append(ground)
 
 def game_scene3():
-    global platforms, portalList, ground
+    global platforms, portalList, ground, MovingPlatFormsList
+
+    MovingPlatFormsList.append(MovingPlatform(13, -5, 5, 1, 1, 1))
+    MovingPlatFormsList.append(MovingPlatform(13, 5, -5, 5.5, 5.5, 1))
+    MovingPlatFormsList.append(MovingPlatform(13, -5, 5, 10, 10, 1))
 
     player.set_position((0, 0, 0))
 
@@ -285,7 +287,7 @@ def game_scene3():
     ground.position_setter((lava.position_getter().x_getter(), lava.position_getter().y_getter() - 0.25, lava.position_getter().z_getter()))
     spawn = Entity(model='cube', scale=Vec3(2, 0.5, 2), position=Vec3(0, 0, 0), collider="box", texture="brick")
 
-    portalList = create_portal(Vec3(6, 14.75, 0))
+    portalList = create_portal(Vec3(0, 14.5, 12))
     portalFrame, PortalPortal = portalList
 
     for i in range(1, 4):
@@ -307,7 +309,6 @@ def game_scene3():
         platform = Entity(model="cube", scale=Vec3(1.5, 0.1, 1.5), position=Vec3(j * 3 - m * 3, i + j + k + m, i * 3 - k * 3), collider="box")
         platforms.append(platform)
         GameScene3.append(platform)
-        print(j * 3 - m * 3, i + j + k + m, i * 3 - k * 3)
 
     GameScene3.append(player)
     GameScene3.append(spawn)
@@ -389,7 +390,7 @@ def update():
         if movingPlatform.Entity.intersects(player.player).hit:
             movingPlatform.Entity.color = color.white50
         else:
-            movingPlatform.Entity.color = color.green
+            movingPlatform.Entity.color = color.blue
 
 
 main()
