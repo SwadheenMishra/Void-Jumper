@@ -26,12 +26,12 @@ def speak(text: str, fileName, tld="co.uk"):
 def dialog2():
     def speak_all():
         speak(
-            "Well done, Agent. Now, let us raise the stakes. "
+            "Well done, Agent. Now, let's raise the stakes. "
             "The ground has been replaced with molten lava. Tread wisely.",
             "f2.mp3"
         )
         speak(
-            "Observe: if you encounter any cyan spheres, you may grapple toward them by clicking. ",
+            "Observe: if you encounter any cyan spheres, you may grapple towards them by clicking. ",
             "f2_1.mp3"
         )
     threading.Thread(target=speak_all, daemon=True).start()
@@ -65,5 +65,5 @@ def dialog4():
     threading.Thread(target=speak_all, args=["ca"], daemon=True).start()
 
 if __name__ == "__main__":
-    dialog4()
+    dialog2()
     while True: pass

@@ -19,7 +19,6 @@ def play_dialog1():
 
 def play_dialog2():
     def play():
-        # pygame.mixer.stop()
         play_sound("Audio/f2.mp3")
         time.sleep(1)
         play_sound("Audio/f2_1.mp3")

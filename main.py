@@ -161,7 +161,7 @@ def main_menu():
         text="Quit",
         scale=(0.4, 0.2),  # Width and height
         origin=(0,0.9),
-        on_click=lambda: print("test quit"),
+        on_click=exit,
         text_size=3.5
     )
 
@@ -316,8 +316,6 @@ def game_scene3():
         platforms.append(platform)
         GameScene3.append(platform)
 
-    
-
     sound.play_dialog3()
 
     GameScene3.append(player)
@@ -333,6 +331,20 @@ def game_scene4():
     for MP in MovingPlatFormsList:
         MP.disable()
 
+
+    MovingPlatFormsList.append(MovingPlatform(1, -5, 5, 3, 3, 1))
+    MovingPlatFormsList.append(MovingPlatform(2, 5, -5, 7.5, 7.5, 1))
+    MovingPlatFormsList.append(MovingPlatform(3, -5, 5, 12, 12, 1))
+    MovingPlatFormsList.append(MovingPlatform(4, 5, -5, 16.5, 16.5, 1))
+
+    hookshot_target = Button(parent=scene, model='sphere', color=color.cyan, position=(0,14,25), scale=0.6)
+    hookshot_target.on_click = lambda: graple(hookshot_target)
+
+    MovingPlatFormsList.append(MovingPlatform(4, -5, 5, 11.5 + 19, 11.5 + 19, 1))
+    MovingPlatFormsList.append(MovingPlatform(3, 5, -5, 16 + 19, 16 + 19, 1))
+    MovingPlatFormsList.append(MovingPlatform(2, -5, 5, 20.5 + 19, 20.5 + 19, 1))
+    MovingPlatFormsList.append(MovingPlatform(1, 5, -5, 25 + 19, 25 + 19, 1))
+
     player.set_position((0, 0, 0))
 
     platforms = []
@@ -342,7 +354,6 @@ def game_scene4():
     ground.position_setter((lava.position_getter().x_getter(), lava.position_getter().y_getter() - 0.25, lava.position_getter().z_getter()))
     spawn = Entity(model='cube', scale=Vec3(2, 0.5, 2), position=Vec3(0, 0, 0), collider="box", texture="brick")
 
-
     sound.play_dialog4()
 
     GameScene4.append(player)
@@ -351,8 +362,13 @@ def game_scene4():
     GameScene4.append(spawn)
 
 def main():
-    main_menu()
-    util.set_scene(MainMenuScene1, scenes)
+    # MAIN CODE
+    # main_menu()
+    # util.set_scene(MainMenuScene1, scenes)
+
+    # TEST CODE
+    util.set_scene(GameScene4, scenes)
+    game_scene4()
 
 def update():
     global TimeWhenTextureChanged
