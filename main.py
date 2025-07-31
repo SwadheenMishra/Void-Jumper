@@ -99,15 +99,38 @@ class MovingPlatform:
         self.xEnd = xEnd
         self.zStart = zStart
         self.zEnd = zEnd
+        self.TargetPos = [self.xEnd, self.zEnd]
         self.speed = speed
 
     def calculate_move_vector(self, current, target):
-        MoveVector = [target[0] - current[0], target[1] - current[1]]
-        return MoveVector
+        x, z = 0, 0
+
+        deltaX, deltaZ = abs(target[0] - current[0]), abs(target[1] - current[1])
+
+        if deltaX >= 0.02:
+            if target[0] > current[0]:
+                x = 1
+            elif target[0] < current[0]:
+                x = -1
+
+        if deltaZ >= 0.02:
+            if target[1] > current[1]:
+                z = 1
+            elif target[1] < current[1]:
+                z = -1
+
+        return [x, z]
     
     def update(self):
-        vec = self.calculate_move_vector([self.Entity.x_getter(), self.Entity.z_getter()], [self.xEnd, self.zEnd])
-        Vec3(vec[0], 0, vec[1]) * time.dt * self.speed
+        vec = self.calculate_move_vector([self.Entity.x_getter(), self.Entity.z_getter()], self.TargetPos)
+
+        if vec == [0, 0]:
+            if self.TargetPos == [self.xEnd, self.zEnd]:
+                self.TargetPos = [self.xStart, self.zStart]
+            else:
+                self.TargetPos = [self.xEnd, self.zEnd]
+
+        self.Entity.set_position(self.Entity.get_position() + (Vec3(vec[0], 0, vec[1]) * time.dt * self.speed))
 
 def create_platform(pos: Vec3):
     return Entity(model="cube", scale=Vec3(1.5, 0.1, 1.5), position=pos, collider="box")
@@ -156,6 +179,7 @@ def create_portal(pos: Vec3) -> list[Entity, Entity]:
     
     return portal
 
+
 def graple(hookshot_target: Button):
     if util.distance_between(player.player, hookshot_target) > 17:
         return
@@ -165,6 +189,8 @@ def graple(hookshot_target: Button):
 
 def game_scene1():
     global platforms, portalList, GunItem, MovingPlatFormsList
+
+    MovingPlatFormsList.append(MovingPlatform(2, -5, 5, -5, 5, 1))
 
     platforms = []
     ground = Entity(model='plane', collider='box', scale=64, color=color.black50, texture_scale=(10,10), Collider="box")
@@ -356,6 +382,14 @@ def update():
             randomScale = (3 + random.random()) * 10
             set_lava_scale((randomScale, randomScale))
             TimeWhenTextureChanged = time.time()
+    
+    for movingPlatform in MovingPlatFormsList:
+        movingPlatform.update()
+
+        if movingPlatform.Entity.intersects(player.player).hit:
+            movingPlatform.Entity.color = color.white50
+        else:
+            movingPlatform.Entity.color = color.green
 
 
 main()
